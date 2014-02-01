@@ -11,7 +11,7 @@ object Tag {
   implicit val writer = Json.writes[Tag]
 }
 
-case class Article(description: String, content: String) extends Tagged
+case class Article(uuid: String, description: String, content: String) extends Tagged
 
 object Article {
   implicit val reader = Json.reads[Article]

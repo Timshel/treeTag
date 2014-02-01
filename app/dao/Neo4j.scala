@@ -105,7 +105,7 @@ object Neo4j{
   def tag(uuid: String, tag: Tag) = {
     val query = Json.obj( "query"  ->
       """
-        MATCH (a:article { uuic: {uuid} })
+        MATCH (a:article { uuid: {uuid} })
         MATCH (t:tag { name: {tagName} })
         MERGE (a)-[:TAGGED]->(t)
       """,
