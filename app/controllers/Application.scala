@@ -17,18 +17,11 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def tag(name: String) = Action.async {
-    dao.Neo4j.fetch(name).map { d =>
-      Ok( Json.toJson(
-        d.map {
-          case (t, e: Tag) => Json.obj("tag" -> t, "elt" -> e)
-          case (t, e: Article) => Json.obj("tag" -> t, "elt" -> e)
-        }
-      ))
-    }
+  def tagTag(name: String, tag: String) = Action.async {
+    dao.Neo4j.tag(Tag(name), Tag(tag)).map { b => Ok(b.toString) }
   }
 
-  def createTag(name: String) = Action.async {
+  def tagCreate(name: String) = Action.async {
     dao.Neo4j.create(Tag(name)).map { b => Ok(b.toString) }
   }
 
@@ -37,11 +30,26 @@ object Application extends Controller {
     (__ \ 'tags).read[Seq[Tag]]
   ) tupled
 
-  def createArticle = Action.async(parse.json) { r =>
+  def articleCreate = Action.async(parse.json) { r =>
     r.body.validate(articleReads).map { case (a, t) =>
       dao.Neo4j.create(a, t).map { b => Ok(b.toString) }
     } recoverTotal {
       case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
+    }
+  }
+
+  def articleTag(uuid: String, tag: String) = Action.async {
+    dao.Neo4j.tag(uuid: String, Tag(tag)).map { b => Ok(b.toString) }
+  }
+
+  def fetchTag(name: String) = Action.async {
+    dao.Neo4j.fetch(name).map { d =>
+      Ok( Json.toJson(
+        d.map {
+          case (t, e: Tag) => Json.obj("tag" -> t, "elt" -> e)
+          case (t, e: Article) => Json.obj("tag" -> t, "elt" -> e)
+        }
+      ))
     }
   }
 

@@ -47,7 +47,7 @@ object Neo4j{
   def create(tag: Tag): Future[Either[String, Int]] = {
     val query = Json.obj( "query"  ->
       """
-        CREATE (t:tag { name: {tagName} }) RETURN t
+        MERGE (t:tag { name: {tagName} }) RETURN t
       """,
       "params" -> Json.obj("tagName" -> tag.name )
     )
@@ -63,8 +63,12 @@ object Neo4j{
   def create(article: Article, tags: Seq[Tag]): Future[Either[String, Int]] = {
 
     val (query, params) = tags.zipWithIndex.foldLeft((
-      """CREATE (a:article { description: {description}, content: {content} })""",
-      Json.obj( "description" -> article.description, "content" -> article.content )
+      """CREATE (a:article { uuid: {uuid}, description: {description}, content: {content} })""",
+      Json.obj(
+        "uuid"        -> java.util.UUID.randomUUID.toString,
+        "description" -> article.description,
+        "content"     -> article.content
+      )
     )){ case ( (query, params) , (tag, index) ) =>
       (
         query + s", (a)-[:TAGGED]->(t$index:tag {name: {tagName$index} })",
@@ -76,6 +80,42 @@ object Neo4j{
       r.status match {
         case 200 | 201 => Right(r.status)
         case _         => Left(r.body)
+      }
+    }
+  }
+
+  def tag(tagged: Tag, tag: Tag) = {
+    val query = Json.obj( "query"  ->
+      """
+        MATCH (td:tag { name: {taggedName} })
+        MATCH (t:tag { name: {tagName} })
+        MERGE (td)-[:TAGGED]->(t)
+      """,
+      "params" -> Json.obj("taggedName" -> tagged.name, "tagName" -> tag.name )
+    )
+
+    ws(query).map { r =>
+      r.status match {
+        case 200 | 201  => Right(r.status)
+        case _          => Left(r.body)
+      }
+    }
+  }
+
+  def tag(uuid: String, tag: Tag) = {
+    val query = Json.obj( "query"  ->
+      """
+        MATCH (a:article { uuic: {uuid} })
+        MATCH (t:tag { name: {tagName} })
+        MERGE (a)-[:TAGGED]->(t)
+      """,
+      "params" -> Json.obj("uuid" -> uuid, "tagName" -> tag.name )
+    )
+
+    ws(query).map { r =>
+      r.status match {
+        case 200 | 201  => Right(r.status)
+        case _          => Left(r.body)
       }
     }
   }
