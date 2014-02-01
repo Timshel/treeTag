@@ -25,8 +25,12 @@ object Application extends Controller {
     dao.Neo4j.create(Tag(name)).map { b => Ok(b.toString) }
   }
 
+  def tagDelete(name: String) = Action.async {
+    dao.Neo4j.delete(Tag(name)).map { b => Ok(b.toString) }
+  }
+
   val articleReads = (
-    (__ \ 'article).read[Article] and
+    (__ \ 'article).read[Article](Article.createReader) and
     (__ \ 'tags).read[Seq[Tag]]
   ) tupled
 
@@ -36,6 +40,10 @@ object Application extends Controller {
     } recoverTotal {
       case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
     }
+  }
+
+  def articleDelete(uuid: String) = Action.async {
+    dao.Neo4j.delete(uuid).map { b => Ok(b.toString) }
   }
 
   def articleTag(uuid: String, tag: String) = Action.async {

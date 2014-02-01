@@ -1,6 +1,7 @@
 package models
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 sealed trait Tagged
 
@@ -14,8 +15,18 @@ object Tag {
 case class Article(uuid: String, description: String, content: String) extends Tagged
 
 object Article {
+
   implicit val reader = Json.reads[Article]
   implicit val writer = Json.writes[Article]
+
+  val createReader: Reads[Article] = (
+    (__ \ 'description).read[String] and
+    (__ \ 'content).read[String]
+  )(Article.create _)
+
+  def create(description: String, content: String): Article =
+    Article( java.util.UUID.randomUUID.toString, description, content)
+
 }
 
 case class Node(tag: Tag, childs: Seq[Node], articles: Seq[Article])

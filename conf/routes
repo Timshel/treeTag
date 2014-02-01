@@ -6,9 +6,11 @@
 GET     /                           controllers.Application.index
 
 PUT     /tag/:name                  controllers.Application.tagCreate(name: String)
+DELETE  /tag/:name                  controllers.Application.tagDelete(name: String)
 PUT     /tag/:name/tag/:tag         controllers.Application.tagTag(name: String, tag: String)
 
 POST    /article                    controllers.Application.articleCreate
+DELETE  /article/:uuid              controllers.Application.articleDelete(uuid: String)
 PUT     /article/:uuid/tag/:tag     controllers.Application.articleTag(uuid: String, tag: String)
 
 GET     /tag/:name                  controllers.Application.fetchTag(name: String)
