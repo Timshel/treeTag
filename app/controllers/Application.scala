@@ -4,8 +4,11 @@ import models._
 
 import play.api._
 import play.api.mvc._
-import play.api.libs.json._
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Application extends Controller {
@@ -27,6 +30,19 @@ object Application extends Controller {
 
   def createTag(name: String) = Action.async {
     dao.Neo4j.create(Tag(name)).map { b => Ok(b.toString) }
+  }
+
+  val articleReads = (
+    (__ \ 'article).read[Article] and
+    (__ \ 'tags).read[Seq[Tag]]
+  ) tupled
+
+  def createArticle = Action.async(parse.json) { r =>
+    r.body.validate(articleReads).map { case (a, t) =>
+      dao.Neo4j.create(a, t).map { b => Ok(b.toString) }
+    } recoverTotal {
+      case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
+    }
   }
 
 }

@@ -44,7 +44,7 @@ object Neo4j{
     }
   }
 
-  def create(tag: Tag): Future[Boolean] = {
+  def create(tag: Tag): Future[Either[String, Int]] = {
     val query = Json.obj( "query"  ->
       """
         CREATE (t:tag { name: {tagName} }) RETURN t
@@ -54,8 +54,28 @@ object Neo4j{
 
     ws(query).map { r =>
       r.status match {
-        case 201 => true
-        case _   => false
+        case 201 => Right(r.status)
+        case _   => Left(r.body)
+      }
+    }
+  }
+
+  def create(article: Article, tags: Seq[Tag]): Future[Either[String, Int]] = {
+
+    val (query, params) = tags.zipWithIndex.foldLeft((
+      """CREATE (a:article { description: {description}, content: {content} })""",
+      Json.obj( "description" -> article.description, "content" -> article.content )
+    )){ case ( (query, params) , (tag, index) ) =>
+      (
+        query + s", (a)-[:TAGGED]->(t$index:tag {name: {tagName$index} })",
+        params + ( s"tagName$index", JsString(tag.name) )
+      )
+    }
+
+    ws( Json.obj( "query"  -> query, "params" -> params ) ).map { r =>
+      r.status match {
+        case 200 | 201 => Right(r.status)
+        case _         => Left(r.body)
       }
     }
   }
