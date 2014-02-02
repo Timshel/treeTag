@@ -30,7 +30,10 @@ object Application extends Controller {
   }
 
   def tagCreate(name: String) = Action.async {
-    dao.Neo4j.create(Tag(name)).map { b => Ok(b.toString) }
+    for {
+      e <- dao.Neo4j.create(Tag(name))
+      t <- dao.Neo4j.tag(Tag(name), Tag("root"))
+    } yield Ok(t.toString)
   }
 
   def tagDelete(name: String) = Action.async {

@@ -7,7 +7,7 @@
 GET     /                               controllers.Application.index()
 GET     /:name                          controllers.Application.indexTag(name: String)
 
-PUT     /api/tag/:name                  controllers.Application.tagCreate(name: String)
+POST    /api/tag/:name                  controllers.Application.tagCreate(name: String)
 DELETE  /api/tag/:name                  controllers.Application.tagDelete(name: String)
 PUT     /api/tag/:name/tag/:tag         controllers.Application.tagTag(name: String, tag: String)
 
