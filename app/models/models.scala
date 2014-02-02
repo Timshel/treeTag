@@ -12,7 +12,7 @@ object Tag {
   implicit val writer = Json.writes[Tag]
 }
 
-case class Article(uuid: String, description: String, content: String, tags: Seq[Tag]) extends Tagged
+case class Article(uuid: String, description: String, content: String) extends Tagged
 
 object Article {
 
@@ -21,12 +21,11 @@ object Article {
 
   val createReader: Reads[Article] = (
     (__ \ 'description).read[String] and
-    (__ \ 'content).read[String] and
-    (__ \ 'tags).read[Seq[Tag]]
+    (__ \ 'content).read[String]
   )(Article.create _)
 
-  def create(description: String, content: String, tags: Seq[Tag]): Article =
-    Article( java.util.UUID.randomUUID.toString, description, content, tags)
+  def create(description: String, content: String): Article =
+    Article( java.util.UUID.randomUUID.toString, description, content)
 
 }
 

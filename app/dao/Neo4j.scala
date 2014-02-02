@@ -80,7 +80,8 @@ object Neo4j{
   }
 
 
-  def create(article: Article): Future[Either[String, Int]] = {
+  def create(article: Article, tags: Seq[Tag]): Future[Either[String, Int]] = {
+
     val (query, params) = (
       """CREATE (a:article { uuid: {uuid}, description: {description}, content: {content} })""",
       Json.obj(
@@ -92,7 +93,7 @@ object Neo4j{
 
     for {
       e <- ws( Json.obj( "query"  -> query, "params" -> params ) ).toEither
-      t <- Future.sequence( article.tags.map( tag(article.uuid, _) ) )
+      t <- Future.sequence( tags.map( tag(article.uuid, _) ) )
     } yield e
   }
 
