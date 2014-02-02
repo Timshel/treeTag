@@ -49,8 +49,11 @@ object Nodes extends Neo4j {
         }
       }
 
-      val nodes = tags.flatMap( t => buildTree(t, tagMap, articleTags) )
+      val nodes = tags.sortBy(_.name)
+                      .flatMap( t => buildTree(t, tagMap, articleTags) )
+
       val leafs = articles.flatMap { a => articleTags.get(a).map( Leaf(a, _ )) }
+                          .sortBy(_.article.description)
 
       Node(root, nodes, leafs )
     }
