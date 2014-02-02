@@ -8,7 +8,7 @@ import play.api.libs.json._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object Neo4j{
+trait Neo4j {
 
   val url = "http://localhost:7474/db/data/cypher"
 
@@ -28,31 +28,9 @@ object Neo4j{
       .post(query)
   }
 
-  def fetch(name: String): Future[Seq[(Tag, Tagged)]] = {
-    val query = Json.obj(
-      "query"  -> """
-        MATCH (e)-[:TAGGED*]->(b:tag) WHERE b.name = {nodeName}
-        MATCH (t:tag)-[:TAGGED]->(e)
-        RETURN distinct t, e
-      """,
-      "params" -> Json.obj("nodeName" -> name )
-    )
+}
 
-    ws(query).map { r =>
-      ( r.json \ "data" ).as[JsArray].value.map { a =>
-        a.as[JsArray].value.map{ e => ( e \ "data" ) } match {
-          case Seq(t, e) => ( t, e )
-          case _         => throw new RuntimeException("Invalid response")
-        }
-      }.flatMap { case (t, a) =>
-        (a.asOpt[Tag], a.asOpt[Article]) match {
-          case ( Some(tt), _ ) => Some( (t.as[Tag], tt) )
-          case ( _, Some(a) ) => Some( (t.as[Tag], a) )
-          case _              => None
-        }
-      }
-    }
-  }
+object Neo4j extends Neo4j {
 
   def create(tag: Tag): Future[Either[String, Int]] = {
     val query = Json.obj( "query"  ->
@@ -80,20 +58,20 @@ object Neo4j{
   }
 
 
-  def create(article: Article, tags: Seq[Tag]): Future[Either[String, Int]] = {
+  def create(leaf: Leaf): Future[Either[String, Int]] = {
 
     val (query, params) = (
       """CREATE (a:article { uuid: {uuid}, description: {description}, content: {content} })""",
       Json.obj(
-        "uuid"        -> article.uuid,
-        "description" -> article.description,
-        "content"     -> article.content
+        "uuid"        -> leaf.article.uuid,
+        "description" -> leaf.article.description,
+        "content"     -> leaf.article.content
       )
     )
 
     for {
       e <- ws( Json.obj( "query"  -> query, "params" -> params ) ).toEither
-      t <- Future.sequence( tags.map( tag(article.uuid, _) ) )
+      t <- Future.sequence( leaf.tags.map( tag(leaf.article.uuid, _) ) )
     } yield e
   }
 

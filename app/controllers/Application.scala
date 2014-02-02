@@ -32,11 +32,11 @@ object Application extends Controller {
   val articleReads = (
     (__ \ 'article).read[Article](Article.createReader) and
     (__ \ 'tags).read[Seq[Tag]]
-  ) tupled
+  )(Leaf.apply _)
 
   def articleCreate = Action.async(parse.json) { r =>
-    r.body.validate(articleReads).map { case (a, t) =>
-      dao.Neo4j.create(a, t).map { b => Ok(b.toString) }
+    r.body.validate(articleReads).map { l =>
+      dao.Neo4j.create(l).map { b => Ok(b.toString) }
     } recoverTotal {
       case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
     }
@@ -51,7 +51,7 @@ object Application extends Controller {
   }
 
   def fetchTag(name: String) = Action.async {
-    dao.Neo4j.fetch(name).map { d =>
+    dao.Nodes.fetch(name).map { d =>
       Ok( Json.toJson(
         d.map {
           case (t, e: Tag) => Json.obj("tag" -> t, "elt" -> e)

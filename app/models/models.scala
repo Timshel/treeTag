@@ -29,31 +29,16 @@ object Article {
 
 }
 
-case class Node(tag: Tag, childs: Seq[Node], articles: Seq[Article])
+case class Leaf(article: Article, tags: Seq[Tag])
+
+object Leaf {
+  implicit val reader = Json.reads[Leaf]
+  implicit val writer = Json.writes[Leaf]
+}
+
+case class Node(tag: Tag, childs: Seq[Node], articles: Seq[Leaf])
 
 object Node {
-
-  private def buildTree(root: Tag, tagMap: Map[Tag, Seq[Tagged]]): Option[Node] = {
-    tagMap.get(root).map { c =>
-      val (tags, articles) = c.foldLeft[(Seq[Tag], Seq[Article])]( (Nil, Nil) ) { (acc, t) =>
-        t match {
-          case a : Article => (acc._1, a +: acc._2)
-          case t : Tag     => (t +: acc._1, acc._2)
-        }
-      }
-      val nodes = tags.flatMap( t => buildTree(t, tagMap) )
-      Node(root, nodes, articles)
-    }
-  }
-
-  def create(root: Tag, elts: Seq[(Tag, Tagged)]): Option[Node] = {
-    val articleTags: Map[Article, Seq[Tag]] = elts.flatMap {
-      case (t, a: Article) => Some( ( t, a ) )
-      case _               => None
-    }.groupBy(_._2).mapValues { v => v.map(_._1).sortBy(_.name) }
-
-    val tagMap: Map[Tag, Seq[Tagged]] = elts.groupBy(_._1).mapValues { v => v.map(_._2) }
-
-    buildTree(root, tagMap)
-  }
+  implicit val reader = Json.reads[Node]
+  implicit val writer = Json.writes[Node]
 }
