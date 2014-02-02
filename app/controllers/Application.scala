@@ -29,14 +29,9 @@ object Application extends Controller {
     dao.Neo4j.delete(Tag(name)).map { b => Ok(b.toString) }
   }
 
-  val articleReads = (
-    (__ \ 'article).read[Article](Article.createReader) and
-    (__ \ 'tags).read[Seq[Tag]]
-  ) tupled
-
   def articleCreate = Action.async(parse.json) { r =>
-    r.body.validate(articleReads).map { case (a, t) =>
-      dao.Neo4j.create(a, t).map { b => Ok(b.toString) }
+    r.body.validate(Article.createReader).map { a =>
+      dao.Neo4j.create(a).map { b => Ok(b.toString) }
     } recoverTotal {
       case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
     }
