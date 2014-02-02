@@ -40,6 +40,10 @@ object Application extends Controller {
     dao.Neo4j.delete(Tag(name)).map { b => Ok(b.toString) }
   }
 
+  def tagUnTag(name: String, tag: String) = Action.async {
+   dao.Neo4j.unTag(Tag(name), Tag(tag)).map { b => Ok(b.toString) }
+  }
+
   val articleReads = (
     (__ \ 'article).read[Article](Article.createReader) and
     (__ \ 'tags).read[Seq[Tag]]
@@ -67,6 +71,10 @@ object Application extends Controller {
 
   def articleTag(uuid: String, tag: String) = Action.async {
     dao.Neo4j.tag(uuid: String, Tag(tag)).map { b => Ok(b.toString) }
+  }
+
+  def articleUnTag(uuid: String, tag: String) = Action.async {
+    dao.Neo4j.unTag(uuid: String, Tag(tag)).map { b => Ok(b.toString) }
   }
 
   def fetchTag(name: String) = Action.async {

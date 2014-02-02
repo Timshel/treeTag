@@ -57,7 +57,6 @@ object Neo4j extends Neo4j {
     ws(query).toEither
   }
 
-
   def create(leaf: Leaf): Future[Either[String, Int]] = {
 
     val (query, params) = (
@@ -95,10 +94,10 @@ object Neo4j extends Neo4j {
   def delete(uuid: String): Future[Either[String, Int]] = {
     val query = Json.obj( "query"  ->
       """
-        MATCH (t:article { uuid: {uuid} })
-        OPTIONAL MATCH ()-[r1]->(t)
+        MATCH (a:article { uuid: {uuid} })
+        OPTIONAL MATCH ()-[r1]->(a)
         OPTIONAL MATCH (t)-[r2]->()
-        DELETE t, r1, r2
+        DELETE a, r1, r2
       """,
       "params" -> Json.obj("uuid" -> uuid )
     )
@@ -130,6 +129,22 @@ object Neo4j extends Neo4j {
     } yield e2
   }
 
+  def unTag(tagged: Tag, tag: Tag): Future[Either[String, Int]] = {
+    val query = Json.obj( "query"  ->
+      """
+        MATCH (:tag { name: {tagName} })-[r]->(:tag { name: {taggedName} })
+        DELETE r
+      """,
+      "params" -> Json.obj(
+        "taggedName" -> tagged.name,
+        "tagName"    -> tag.name
+      )
+    )
+
+    ws(query).toEither
+  }
+
+
   def tag(uuid: String, tag: Tag): Future[Either[String, Int]] = {
     val query1 = Json.obj( "query"  ->
       """
@@ -152,6 +167,21 @@ object Neo4j extends Neo4j {
       e1 <- ws(query1).toEither
       e2 <- ws(query2).toEither
     } yield e2
+  }
+
+  def unTag(uuid: String, tag: Tag): Future[Either[String, Int]] = {
+    val query = Json.obj( "query"  ->
+      """
+        MATCH (:tag { name: {tagName} })-[r]->(:article { uuid: {uuid} })
+        DELETE r
+      """,
+      "params" -> Json.obj(
+        "uuid" -> uuid,
+        "tagName" -> tag.name
+      )
+    )
+
+    ws(query).toEither
   }
 
 }
