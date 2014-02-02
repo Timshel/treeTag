@@ -75,6 +75,23 @@ object Neo4j extends Neo4j {
     } yield e
   }
 
+  def update(leaf: Leaf): Future[Either[String, Int]] = {
+
+    val (query, params) = (
+      """MERGE (a:article { uuid: {uuid}, description: {description}, content: {content} })""",
+      Json.obj(
+        "uuid"        -> leaf.article.uuid,
+        "description" -> leaf.article.description,
+        "content"     -> leaf.article.content
+      )
+    )
+
+    for {
+      e <- ws( Json.obj( "query"  -> query, "params" -> params ) ).toEither
+      t <- Future.sequence( leaf.tags.map( tag(leaf.article.uuid, _) ) )
+    } yield e
+  }
+
   def delete(uuid: String): Future[Either[String, Int]] = {
     val query = Json.obj( "query"  ->
       """

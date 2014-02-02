@@ -10,6 +10,7 @@ DELETE  /tag/:name                  controllers.Application.tagDelete(name: Stri
 PUT     /tag/:name/tag/:tag         controllers.Application.tagTag(name: String, tag: String)
 
 POST    /article                    controllers.Application.articleCreate
+PUT     /article/:uuid              controllers.Application.articleUpdate(uuid: String)
 DELETE  /article/:uuid              controllers.Application.articleDelete(uuid: String)
 PUT     /article/:uuid/tag/:tag     controllers.Application.articleTag(uuid: String, tag: String)
 

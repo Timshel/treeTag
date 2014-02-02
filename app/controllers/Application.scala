@@ -42,6 +42,14 @@ object Application extends Controller {
     }
   }
 
+  def articleUpdate(uuid: String) = Action.async(parse.json) { r =>
+    r.body.validate[Leaf].map { l =>
+      dao.Neo4j.update(l).map { b => Ok(b.toString) }
+    } recoverTotal {
+      case e => Future.successful( BadRequest( Json.prettyPrint(JsError.toFlatJson(e)) ) )
+    }
+  }
+
   def articleDelete(uuid: String) = Action.async {
     dao.Neo4j.delete(uuid).map { b => Ok(b.toString) }
   }
