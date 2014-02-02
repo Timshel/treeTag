@@ -32,7 +32,7 @@ object Neo4j{
     val query = Json.obj(
       "query"  -> """
         MATCH (e)-[:TAGGED*]->(b:tag) WHERE b.name = {nodeName}
-        MATCH (e)-[:TAGGED]->(t:tag)
+        MATCH (t:tag)-[:TAGGED]->(e)
         RETURN distinct t, e
       """,
       "params" -> Json.obj("nodeName" -> name )
@@ -123,7 +123,7 @@ object Neo4j{
       """
         MATCH (td:tag { name: {taggedName} })
         MATCH (t:tag { name: {tagName} })
-        MERGE (td)-[:TAGGED]->(t)
+        MERGE (t)-[:TAGGED]->(td)
       """,
       "params" -> Json.obj("taggedName" -> tagged.name, "tagName" -> tag.name )
     )
@@ -147,7 +147,7 @@ object Neo4j{
       """
         MATCH (a:article { uuid: {uuid} })
         MATCH (t:tag { name: {tagName} })
-        MERGE (a)-[:TAGGED]->(t)
+        MERGE (t)-[:TAGGED]->(a)
       """,
       "params" -> Json.obj("uuid" -> uuid, "tagName" -> tag.name )
     )
