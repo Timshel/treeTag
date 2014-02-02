@@ -12,7 +12,16 @@ object Tag {
   implicit val writer = Json.writes[Tag]
 }
 
-case class Article(uuid: String, description: String, content: String) extends Tagged
+case class Article(uuid: String, description: String, content: String) extends Tagged{
+
+  override def equals(o: Any):Boolean = o match {
+    case a: Article => uuid == a.uuid
+    case _          => false
+  }
+
+  override def hashCode: Int = uuid.hashCode
+
+}
 
 object Article {
 
