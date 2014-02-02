@@ -1,7 +1,30 @@
-@(message: String)
+@(node: models.Node)
 
-@main("Welcome to Play") {
+@displayTag(node: models.Node) = {
 
-    @play20.welcome(message)
+  <div>
+      <h3>@node.tag.name</h3>
+
+      <ul>
+        @node.articles.map { l =>
+          <li>
+            <h5>@l.article.description - @l.tags.map(_.name).mkString(", ")</h5>
+            <div>@l.article.content</div>
+          </li>
+        }
+      </ul>
+
+      <ul>
+        @node.childs.map { l =>
+          <li>@displayTag(l)</li>
+        }
+      </ul>
+
+  </div>
+}
+
+@main("Display Tag %s".format(node.tag.name)) {
+
+  @displayTag(node)
 
 }

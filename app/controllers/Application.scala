@@ -13,8 +13,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object Application extends Controller {
 
-  def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+  def index = Action.async {
+    dao.Nodes.fetch("root").map { n =>
+      Ok(views.html.index(n))
+    }
+  }
+
+  def indexTag(name: String) = Action.async {
+    dao.Nodes.fetch(name).map { n =>
+      Ok(views.html.index(n))
+    }
   }
 
   def tagTag(name: String, tag: String) = Action.async {
@@ -59,13 +67,8 @@ object Application extends Controller {
   }
 
   def fetchTag(name: String) = Action.async {
-    dao.Nodes.fetch(name).map { d =>
-      Ok( Json.toJson(
-        d.map {
-          case (t, e: Tag) => Json.obj("tag" -> t, "elt" -> e)
-          case (t, e: Article) => Json.obj("tag" -> t, "elt" -> e)
-        }
-      ))
+    dao.Nodes.fetch(name).map { n =>
+      Ok( Json.toJson(n) )
     }
   }
 
