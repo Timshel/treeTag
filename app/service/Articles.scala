@@ -18,7 +18,14 @@ case class ArticleComponent(
       get[UUID]("uuid") ~
       get[Description]("description") ~
       get[Content]("content")
-    ).map { u => Article.gen.from(ToHlist(u)) }
+    ).map { u => ToHlist(u) }
+
+  def insert(a: Article): Future[Boolean] = DB { implicit c =>
+    SQL"""
+      INSERT INTO article (uuid, description, content)
+        VALUES (${a.select[UUID].value}, ${a.select[Description].value}, ${a.select[Content].value} )
+    """.execute
+  }
 
   def find(uuid: UUID): Future[Option[Article]] = DB { implicit c =>
     SQL"""

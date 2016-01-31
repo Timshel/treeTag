@@ -1,16 +1,19 @@
-package models
+package object models {
+  import shapeless.{ ::, HNil }
 
-case class Article(
-  uuid:         Article.UUID,
-  description:  Article.Description,
-  content:      Article.Content
-)
+  type Article = Article.UUID :: Article.Description :: Article.Content :: HNil
 
-object Article {
-  val gen = shapeless.Generic[Article]
+}
 
-  case class UUID(value: String) extends AnyVal
-  case class Description(value: String) extends AnyVal
-  case class Content(value: String) extends AnyVal
+package models {
 
+  object Article {
+    case class UUID(value: String) extends AnyVal
+    case class Description(value: String) extends AnyVal
+    case class Content(value: String) extends AnyVal
+
+    object UUID {
+      def gen() = new UUID(java.util.UUID.randomUUID().toString)
+    }
+  }
 }
