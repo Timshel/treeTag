@@ -52,14 +52,14 @@ object Articles extends DefaultWrites with GenericRules {
 
   import com.mandubian.shapelessrules._
 
-  val createR : Rule[JsValue, Article] = from[JsValue] { __ =>
+  val createR : Rule[JsValue, Article] = utils.Validation.Rules.From[JsValue] { __ =>
     UUID.gen() ::
     (__ \ "description").read[Description] ::
     (__ \ "content").read[Content] ::
     HNil
   }
 
-  val articleR: Rule[JsValue, Article] = from[JsValue] { __ =>
+  val articleR: Rule[JsValue, Article] = From[JsValue] { __ =>
     (__ \ "uuid").read[UUID] ::
     (__ \ "description").read[Description] ::
     (__ \ "content").read[Content] ::
