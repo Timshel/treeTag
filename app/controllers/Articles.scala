@@ -50,18 +50,21 @@ object Articles extends DefaultWrites with GenericRules {
   import utils.Validation.Rules._
   import shapeless._, syntax.std.product._
 
-  val createR : Rule[JsValue, Article] = From[JsValue] { __ =>
-    ( (__ \ "description").read[Description] and
-      (__ \ "content").read[Content]
-    ).tupled
-  }.fmap { t => UUID.gen() :: t.productElements }
+  import com.mandubian.shapelessrules._
 
-  val articleR: Rule[JsValue, Article] = From[JsValue] { __ =>
-    ( (__ \ "uuid").read[UUID] and
-      (__ \ "description").read[Description] and
-      (__ \ "content").read[Content]
-    ).tupled
-  }.fmap(_.productElements)
+  val createR : Rule[JsValue, Article] = from[JsValue] { __ =>
+    UUID.gen() ::
+    (__ \ "description").read[Description] ::
+    (__ \ "content").read[Content] ::
+    HNil
+  }
+
+  val articleR: Rule[JsValue, Article] = from[JsValue] { __ =>
+    (__ \ "uuid").read[UUID] ::
+    (__ \ "description").read[Description] ::
+    (__ \ "content").read[Content] ::
+    HNil
+  }
 
   val articlesR = seqR(articleR)
 
