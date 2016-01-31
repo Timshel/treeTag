@@ -1,4 +1,6 @@
-package dao
+package service
+
+/*
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -6,41 +8,18 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import models._
+object Nodes {
 
-object Nodes extends Neo4j {
+  sealed trait Tagged
+  case class Tag(name: String) extends Tagged
+  case class Article(uuid: String, description: String, content: String)
+
+  case class Leaf(article: Article, tags: Seq[Tag])
+  case class Node(tag: Tag, childs: Seq[Node], articles: Seq[Leaf])
 
   case class CoreArticle(uui: String, description: String, content: String)
 
-  def fetch(name: String): Future[Node] = {
-    val query = Json.obj(
-      "query"  -> """
-        MATCH (b:tag)-[:TAGGED*]->(e) WHERE b.name = {nodeName}
-        MATCH (t:tag)-[:TAGGED]->(e)
-        RETURN distinct t, e
-      """,
-      "params" -> Json.obj("nodeName" -> name )
-    )
-
-    val data = ws(query).map { r =>
-      ( r.json \ "data" ).as[JsArray].value.map { a =>
-        a.as[JsArray].value.map{ e => ( e \ "data" ) } match {
-          case Seq(t, e) => ( t, e )
-          case _         => throw new RuntimeException("Invalid response")
-        }
-      }.flatMap { case (t, a) =>
-        (a.asOpt[Tag], a.asOpt[Article]) match {
-          case ( Some(tt), _ ) => Some( (t.as[Tag], tt) )
-          case ( _, Some(a) ) => Some( (t.as[Tag], a) )
-          case _              => None
-        }
-      }
-    }
-
-    data.map { d =>
-      convert(Tag(name), d)
-    }
-  }
+  def fetch(name: String): Future[Node] = ???
 
   def convert(root: Tag, elts: Seq[(Tag, Tagged)]): Node = {
     val articleTags: Map[Article, Seq[Tag]] = elts.flatMap {
@@ -75,3 +54,4 @@ object Nodes extends Neo4j {
   }
 
 }
+*/

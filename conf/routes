@@ -4,21 +4,9 @@
 
 # Home page
 
-GET     /                               controllers.Application.index()
-GET     /:name                          controllers.Application.indexTag(name: String)
-
-POST    /api/tag/:name                  controllers.Application.tagCreate(name: String)
-DELETE  /api/tag/:name                  controllers.Application.tagDelete(name: String)
-PUT     /api/tag/:name/tag/:tag         controllers.Application.tagTag(name: String, tag: String)
-DELETE  /api/tag/:name/tag/:tag         controllers.Application.tagUnTag(name: String, tag: String)
-
-POST    /api/article                    controllers.Application.articleCreate
-PUT     /api/article/:uuid              controllers.Application.articleUpdate(uuid: String)
-DELETE  /api/article/:uuid              controllers.Application.articleDelete(uuid: String)
-PUT     /api/article/:uuid/tag/:tag     controllers.Application.articleTag(uuid: String, tag: String)
-DELETE  /api/article/:uuid/tag/:tag     controllers.Application.articleUnTag(uuid: String, tag: String)
-
-GET     /api/nodes/:name                controllers.Application.fetchTag(name: String)
+GET     /api/articles                   controllers.Articles.all()
+GET     /api/articles/:uuid             controllers.Articles.get(uuid: Article.UUID)
+DELETE  /api/articles/:uuid             controllers.Articles.delete(uuid: Article.UUID)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

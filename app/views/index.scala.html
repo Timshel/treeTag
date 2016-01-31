@@ -1,30 +1,4 @@
-@(node: models.Node)
+@()
 
-@displayTag(node: models.Node) = {
-
-  <div>
-      <h3>@node.tag.name</h3>
-
-      <ul>
-        @node.articles.map { l =>
-          <li>
-            <h5>@l.article.description - @l.tags.map(_.name).mkString(", ")</h5>
-            <div>@l.article.content</div>
-          </li>
-        }
-      </ul>
-
-      <ul>
-        @node.childs.map { l =>
-          <li>@displayTag(l)</li>
-        }
-      </ul>
-
-  </div>
-}
-
-@main("Display Tag %s".format(node.tag.name)) {
-
-  @displayTag(node)
-
+@main("Display Tag") {
 }
