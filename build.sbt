@@ -1,7 +1,7 @@
 name := "treeTag"
 
 version := "1.0-SNAPSHOT"
-scalaVersion := "2.11.6"
+scalaVersion := "2.12.4"
 
 scalacOptions ++= Seq(
   "-Yrangepos",
@@ -25,11 +25,12 @@ libraryDependencies ++= Seq(
   cache,
   jdbc,
   evolutions,
-  "com.typesafe.play" %% "anorm" % "2.5.0",
+  "com.typesafe.play" %% "anorm" % "2.6.11",
+  "com.typesafe.play" %% "play-json" % "2.6.7",
   "io.github.jto" %% "validation-core" % "1.1",
   "io.github.jto" %% "validation-json" % "1.1",
-  "com.chuusai" %% "shapeless" % "2.2.5",
-  "org.scalaz" %% "scalaz-core" % "7.2.0"
+  "com.chuusai" %% "shapeless" % "2.3.3",
+  "org.scalaz" %% "scalaz-core" % "7.2.19"
 )
 
 routesImport  ++= Seq(

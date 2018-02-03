@@ -1,16 +1,8 @@
+const helpers = require('./helpers')
 const webpackConfig = require('./webpack.config.base')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const DefinePlugin = require('webpack/lib/DefinePlugin')
 const env = require('../environment/dev.env')
-const path = require('path')
-
-const ROOT = path.resolve(__dirname, '..')
-
-function root (args) {
-  args = Array.prototype.slice.call(arguments, 0)
-  return path.join.apply(path, [ROOT].concat(args))
-}
-
 
 webpackConfig.module.rules = [...webpackConfig.module.rules,
   {
