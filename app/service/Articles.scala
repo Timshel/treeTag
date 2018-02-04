@@ -6,12 +6,10 @@ import scala.language.postfixOps
 import models._, Article._
 
 case class ArticleComponent(
-	dbEc: EC.DatabaseEC
-) {
+  database : play.api.db.Database
+)(implicit val dbEc: EC.DatabaseEC) extends utils.AnormHelper {
   import anorm._, SqlParser.get
   import utils.Anorm._
-
-	implicit val ec = dbEc.ec
 
   val articleP =
     (

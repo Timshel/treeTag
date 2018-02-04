@@ -7,10 +7,9 @@ scalacOptions ++= Seq(
   "-Yrangepos",
   "-Xlint",
   "-deprecation",
-  "-Xfatal-warnings",
   "-feature",
   "-encoding", "UTF-8",
-  "-unchecked",
+//  "-unchecked",
   "-Yno-adapted-args",
   "-Ywarn-numeric-widen"
 // "-Ywarn-unused-import"
@@ -22,13 +21,13 @@ lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
-  cache,
+  ehcache,
   jdbc,
   evolutions,
-  "com.typesafe.play" %% "anorm" % "2.6.11",
+  "com.typesafe.play" %% "anorm" % "2.5.3",
   "com.typesafe.play" %% "play-json" % "2.6.7",
-  "io.github.jto" %% "validation-core" % "1.1",
-  "io.github.jto" %% "validation-json" % "1.1",
+  "io.github.jto" %% "validation-core" % "2.1.1",
+  "io.github.jto" %% "validation-playjson" % "2.1.1",
   "com.chuusai" %% "shapeless" % "2.3.3",
   "org.scalaz" %% "scalaz-core" % "7.2.19"
 )

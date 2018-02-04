@@ -5,7 +5,6 @@ import shapeless.{ ::, HList, HNil }
 import shapeless.ops.hlist._
 import anorm._
 
-import play.api.Play.current
 import scala.concurrent.{ExecutionContext, Future}
 
 object Anorm {
@@ -37,8 +36,16 @@ object Anorm {
       def apply(s: A ~ B): Out = p(u(s._1), s._2 :: HNil)
     }
   }
+}
 
-  def DB[T](f: java.sql.Connection => T)(implicit ec: ExecutionContext): Future[T] = Future {
-    play.api.db.DB.withConnection { c => f(c) }
+trait AnormHelper {
+
+  def dbEc: models.EC.DatabaseEC
+  def database: play.api.db.Database
+
+  implicit def ec: ExecutionContext = dbEc.ec
+
+  def DB[T](f: java.sql.Connection => T): Future[T] = Future {
+    database.withConnection(f)
   }
 }

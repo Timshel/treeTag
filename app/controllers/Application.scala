@@ -1,12 +1,10 @@
 package controllers
 
-import models._
-
 import play.api.mvc._
 
 class Application(
-  gEc: EC.GlobalEC
-) extends Controller {
+  controllerComponent: play.api.mvc.ControllerComponents
+)(implicit val gEc: models.EC.GlobalEC) extends AbstractController(controllerComponent) {
 
   implicit val ec = gEc
 

@@ -1,10 +1,8 @@
 package com.mandubian
 package shapelessrules
 
-import play.api.data.mapping._
-import play.api.libs.json.JsValue
-import play.api.libs.functional.syntax._
-import play.api.libs.functional._
+import jto.validation._
+import cats.Applicative
 
 import shapeless.{Path => _, _}
 import ops.hlist._
@@ -14,17 +12,14 @@ import scala.language.higherKinds
 
 trait HZip {
 
-  type VV[A] = Validation[(Path, Seq[ValidationError]), A]
-
   object applicativeValidationFolder extends Poly2 {
 
-    implicit def caseApplicative[A, B <: HList](implicit app: Applicative[VV]) =
+    implicit def caseApplicative[A, B <: HList](implicit app: Applicative[VA]) =
       at[Rule[A,A], (Int, Rule[B,B])] { case (ra, (idx, rb)) =>
         ( idx+1,
           Rule[A::B, A::B] {
             case (a:A @unchecked) :: (b:B @unchecked) =>
-              app apply (
-                app map ( rb.validate(b), (bb:B) => (_:A) :: bb ),
+              app.ap(app.map(rb.validate(b)) { bb:B => (_:A) :: bb })(
                 ra.validate(a).fail.map {
                   _.map { case (p, errs) => Path \ idx -> errs }
                 }
@@ -33,14 +28,14 @@ trait HZip {
         )
       }
 
-    implicit def caseApplicative2[A](implicit app: Applicative[VV]) =
+    implicit def caseApplicative2[A](implicit app: Applicative[VA]) =
       at[Rule[A,A], (Int, HNil)] { case (ra, (idx, rb)) =>
         ( idx+1,
           Rule[A::HNil, A::HNil] {
             case (a:A @unchecked) =>
-              app map (ra.validate(a).fail.map {
+              app.map (ra.validate(a).fail.map {
                 _.map { case (p, errs) => Path \ idx -> errs }
-              }, (_:A) :: HNil)
+              }){ (_:A) :: HNil }
           }
         )
       }
@@ -62,11 +57,12 @@ trait HFold {
   object applicativeFolder2 extends Poly2 {
     implicit def caseApp[A, B <: HList, I, F[_, _]](implicit app: Applicative[({ type λ[O] = F[I, O] })#λ]) =
       at[F[I, A], F[I, B]] { (a, b) ⇒
-        app.apply[A, A :: B](app.map[B, A ⇒ A :: B](b, x ⇒ y ⇒ y :: x), a)
+        val ff: F[I, A => A :: B] = app.map[B, A ⇒ A :: B](b){ x ⇒ y ⇒ y :: x}
+        app.ap[A, A :: B](ff)(a)
       }
     implicit def casePure[A, B <: HList, I, F[_, _]](implicit app: Applicative[({ type λ[O] = F[I, O] })#λ], pure: A <:!< F[_, _]) =
       at[A, F[I, B]] { (a, b) ⇒
-        app.apply[A, A :: B](app.map[B, A ⇒ A :: B](b, x ⇒ y ⇒ y :: x), app.pure(a))
+        app.ap[A, A :: B](app.map[B, A ⇒ A :: B](b){ x ⇒ y ⇒ y :: x })(app.pure(a))
       }
   }
 
@@ -81,7 +77,7 @@ trait HFold {
   class FromMaker[I] {
     def apply[L <: HList, O](l: Reader[I] ⇒ L)(
       implicit folder: RightFolder.Aux[L, Rule[I, HNil], applicativeFolder2.type, Rule[I, O]]
-    ) = play.api.data.mapping.From[I](__ ⇒ liftRule[I](l(__)))
+    ) = jto.validation.From[I](__ ⇒ liftRule[I](l(__)))
   }
 
 }

@@ -3,7 +3,7 @@ package utils
 import shapeless.Generic
 import shapeless.{ ::, HList, HNil }
 
-import play.api.data.mapping._
+import jto.validation._
 import scala.concurrent.{ExecutionContext, Future}
 
 import com.mandubian.shapelessrules.{HZip, HFold}
@@ -20,6 +20,9 @@ object Validation {
   }
 
   object Rules extends HZip with HFold {
+
+    implicit def vaApp = implicitly[cats.Applicative[VA]]
+
     implicit def hlistRule[I, H](implicit c: Rule[I, H]): Rule[I, H :: HNil] =
       c.fmap(_ ::HNil)
 

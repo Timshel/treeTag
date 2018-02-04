@@ -1,21 +1,24 @@
 package controllers
 
 import play.api.mvc._
-import play.api.libs.json.{JsValue, JsObject, JsArray, JsString}
+import play.api.libs.json.{JsValue, JsObject, JsString}
 
 import scala.concurrent.Future
 
 import models._, Article._
 
-class Articles(
-  artComp: service.ArticleComponent,
-  gEc:     EC.GlobalEC
-) extends Controller {
+case class Articles(
+  artComp : service.ArticleComponent
+)(
+  implicit 
+  val controllerComponents : play.api.mvc.ControllerComponents, 
+  gEc                      : EC.GlobalEC
+) extends BaseController {
   import Articles._
   implicit val ec = gEc.ec
 
   def create = Action.async(parse.json) { r =>
-    createR.validate(r.body).fold(
+    createR.validate(r.body).fold( 
       err => Future.successful(BadRequest),
       article => artComp.insert(article).map { _ =>
         Ok(new JsString(article.select[UUID].value))
@@ -44,13 +47,11 @@ class Articles(
   }
 }
 
-import play.api.data.mapping._
+import jto.validation._
 object Articles extends DefaultWrites with GenericRules {
-  import play.api.data.mapping.json.Rules._
+  import jto.validation.playjson._, Rules._
   import utils.Validation.Rules._
-  import shapeless._, syntax.std.product._
-
-  import com.mandubian.shapelessrules._
+  import shapeless._
 
   val createR : Rule[JsValue, Article] = utils.Validation.Rules.From[JsValue] { __ =>
     UUID.gen() ::
@@ -59,7 +60,7 @@ object Articles extends DefaultWrites with GenericRules {
     HNil
   }
 
-  val articleR: Rule[JsValue, Article] = From[JsValue] { __ =>
+  val articleR: Rule[JsValue, Article] = utils.Validation.Rules.From[JsValue] { __ =>
     (__ \ "uuid").read[UUID] ::
     (__ \ "description").read[Description] ::
     (__ \ "content").read[Content] ::
@@ -68,14 +69,16 @@ object Articles extends DefaultWrites with GenericRules {
 
   val articlesR = seqR(articleR)
 
-  import play.api.data.mapping.json.Writes._
+  import jto.validation.playjson.Writes._
   import utils.Validation.Writes._
 
   val articleW = To[JsObject] { __ =>
-    ( (__ \ "uuid").write[UUID] and
-      (__ \ "description").write[Description] and
+    ( (__ \ "uuid").write[UUID] ~
+      (__ \ "description").write[Description] ~
       (__ \ "content").write[Content]
     ){ a: Article => a.tupled }
   }
-  val articlesW = seqW(articleW).map(new JsArray(_))
+
+
+  val articlesW: Write[Seq[Article], JsValue] = seqToJsArray(articleW)
 }
