@@ -9,7 +9,7 @@ case class ArticleTable(
 ) extends utils.DBHelper {
   import ArticleTable._
 
-  def upsert(a: Article): Future[Int] = 
+  def upsert(a: NewArticle): Future[Int] = 
     dbContext.run(upsertQuery.run(a))
 
   def find(uuid: UUID): Future[Option[Article]] = 
@@ -25,23 +25,24 @@ case class ArticleTable(
 object ArticleTable extends utils.CommonDoobie {  
   import doobie.implicits._
 
-  val upsertQuery = Update[Article]("""
-    INSERT INTO article (uuid, url, title, description, content)
-      VALUES (?, ?, ?, ?, ?)
+  val upsertQuery = Update[NewArticle]("""
+    INSERT INTO article (uuid, url, title, description, content, created, updated)
+      VALUES (?, ?, ?, ?, ?, now(), now())
       ON CONFLICT (uuid) DO UPDATE SET 
         url         = EXCLUDED.url,
         title       = EXCLUDED.title,
         description = EXCLUDED.description,
-        content     = EXCLUDED.content
+        content     = EXCLUDED.content,
+        updated     = EXCLUDED.updated
   """)
 
   def findQuery(uuid: UUID): Query0[Article] = sql"""
-    SELECT uuid, url, title, description, content 
+    SELECT uuid, url, title, description, content, created, updated
       FROM article WHERE uuid = $uuid
   """.query[Article]
 
   val allQuery: Query0[Article] = sql"""
-    SELECT uuid, url, title, description, content FROM article
+    SELECT uuid, url, title, description, content, created, updated FROM article
   """.query[Article]
 
   val deleteQuery = Update[UUID]("""

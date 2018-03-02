@@ -5,6 +5,8 @@ CREATE TABLE article (
     title 				TEXT NOT NULL,
     description		TEXT,
     content 			TEXT,
+    created 			TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    updated 			TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     
     PRIMARY KEY (uuid)
 );

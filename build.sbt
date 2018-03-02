@@ -17,6 +17,8 @@ scalacOptions ++= Seq(
 // "-Ywarn-unused-import"
 )
 
+javaOptions += "-Duser.timezone=UTC"
+
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 lazy val root = (project in file("."))

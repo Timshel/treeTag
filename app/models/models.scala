@@ -1,7 +1,7 @@
 package object models {
-  import shapeless.{ ::, HNil }
+  import shapeless.{::, HNil }
 
-  type Article = 
+  type NewArticle =
     Article.UUID :: 
     Article.Url ::
     Article.Title ::
@@ -9,6 +9,15 @@ package object models {
     Option[Article.Content] :: 
     HNil
 
+  type Article = 
+    Article.UUID :: 
+    Article.Url ::
+    Article.Title ::
+    Option[Article.Description] ::
+    Option[Article.Content] :: 
+    Article.Created ::
+    Article.Updated ::
+    HNil
 }
 
 package models {
@@ -19,6 +28,8 @@ package models {
     case class Title(value: String) extends AnyVal
     case class Description(value: String) extends AnyVal
     case class Content(value: String) extends AnyVal
+    case class Created(value: java.time.Instant) extends AnyVal
+    case class Updated(value: java.time.Instant) extends AnyVal
 
     object UUID {
       def gen() = new UUID(java.util.UUID.randomUUID().toString)

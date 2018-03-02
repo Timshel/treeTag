@@ -55,6 +55,8 @@ object Articles extends utils.GrammarHelper {
       at(Path \ "title").is(req[Title]) ~:
       at(Path \ "description").is(opt[Description]) ~:
       at(Path \ "content").is(opt[Content]) ~:
+      at(Path \ "created").is(req[Created]) ~:
+      at(Path \ "updated").is(req[Updated]) ~:
       knil
     )
 
@@ -62,7 +64,7 @@ object Articles extends utils.GrammarHelper {
   }
 
   object Rules extends utils.JsonRules with CustomGrammer[Rule] {
-    val create : Rule[JsValue, Article] = (
+    val create : Rule[JsValue, NewArticle] = (
       Rule.pure[JsValue, UUID](UUID.gen) ~:
       at(Path \ "url").is(req[Url]) ~:
       at(Path \ "title").is(req[Title]) ~:
