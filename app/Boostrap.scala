@@ -27,16 +27,16 @@ class ApplicationEnv(context: Context)
   implicit val dbEc = models.EC.DatabaseEC(scala.concurrent.ExecutionContext.Implicits.global)
 
   val connectionPool = new play.api.db.HikariCPConnectionPool(Environment.simple())
-  val defaultDB = dbApi.database("default")
+  val dbContext = utils.DBContext(dbApi.database("default").dataSource, dbEc)
 
-  object Components {
-    val articles = ArticleComponent(defaultDB)
+  object Services {
+    val articleTable = db.ArticleTable(dbContext)
   }
 
   object Controllers {
     // an injected instance of the application controller
     val application = new controllers.Application(controllerComponents)
-    val articles = new controllers.Articles(Components.articles)(controllerComponents, gEc)
+    val articles = new controllers.Articles(Services.articleTable)(controllerComponents, gEc)
   }
 
   val httpFilters = Seq.empty

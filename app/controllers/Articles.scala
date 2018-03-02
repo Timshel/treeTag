@@ -7,7 +7,7 @@ import scala.language.higherKinds
 import models._, Article._
 
 case class Articles(
-  artComp : service.ArticleComponent
+  articleTable : service.db.ArticleTable
 )(
   implicit 
   val controllerComponents : play.api.mvc.ControllerComponents, 
@@ -19,28 +19,28 @@ case class Articles(
   def create = Action.async(parse.json) { r =>
     Rules.create.validate(r.body).fold( 
       err => Future.successful(BadRequest),
-      article => artComp.insert(article).map { _ =>
+      article => articleTable.upsert(article).map { _ =>
         Ok(new JsString(article.select[UUID].value))
       }
     )
   }
 
   def get(uuid: UUID) = Action.async {
-    artComp.find(uuid).map {
+    articleTable.find(uuid).map {
       case Some(a) => Ok(Writes.article.writes(a))
       case None    => NotFound
     }
   }
 
   def delete(uuid: UUID) = Action.async {
-    artComp.delete(uuid).map {
+    articleTable.delete(uuid).map {
       case true  => Ok
       case false => NotFound
     }
   }
 
   def all() = Action.async {
-    artComp.all().map { articles =>
+    articleTable.all().map { articles =>
       Ok(Writes.articles.writes(articles))
     }
   }

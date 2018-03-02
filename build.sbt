@@ -11,7 +11,8 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8",
 //  "-unchecked",
   "-Yno-adapted-args",
-  "-Ywarn-numeric-widen"
+  "-Ywarn-numeric-widen",
+  "-Ypartial-unification"
 // "-Ywarn-unused-import"
 )
 
@@ -24,12 +25,13 @@ libraryDependencies ++= Seq(
   ehcache,
   jdbc,
   evolutions,
-  "com.typesafe.play" %% "anorm" % "2.5.3",
+  "org.tpolecat" %% "doobie-core" % "0.5.1",
+  "org.tpolecat" %% "doobie-postgres"  % "0.5.1", 
+  "org.tpolecat" %% "doobie-scalatest" % "0.5.1" % Test,
   "com.typesafe.play" %% "play-json" % "2.6.7",
   "io.github.jto" %% "validation-core" % "3.0.0-SNAPSHOT",
   "io.github.jto" %% "validation-playjson" % "3.0.0-SNAPSHOT",
-  "com.chuusai" %% "shapeless" % "2.3.3",
-  "org.scalaz" %% "scalaz-core" % "7.2.19"
+  "com.chuusai" %% "shapeless" % "2.3.3"
 )
 
 routesImport  ++= Seq(
