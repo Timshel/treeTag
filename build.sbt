@@ -12,7 +12,8 @@ scalacOptions ++= Seq(
 //  "-unchecked",
   "-Yno-adapted-args",
   "-Ywarn-numeric-widen",
-  "-Ypartial-unification"
+  "-Ypartial-unification",
+  "-language:higherKinds"
 // "-Ywarn-unused-import"
 )
 
