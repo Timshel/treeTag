@@ -9,7 +9,6 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es5",
-    "strict": true,
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

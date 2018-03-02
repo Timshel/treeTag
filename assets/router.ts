@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import VueRouter, { Location, Route, RouteConfig } from 'vue-router'{{#hotReload}}
-import { makeHot, reload } from './util/hot-reload'{{/hotReload}}
+import VueRouter, { Location, Route, RouteConfig } from 'vue-router'
+import { makeHot, reload } from './util/hot-reload'
 
 const homeComponent = () => import('./components/home').then(({ HomeComponent }) => HomeComponent)
 const aboutComponent = () => import('./components/about').then(({ AboutComponent }) => AboutComponent)
@@ -8,7 +8,6 @@ const listComponent = () => import('./components/list').then(({ ListComponent })
 // const homeComponent = () => import(/* webpackChunkName: 'home' */'./components/home').then(({ HomeComponent }) => HomeComponent)
 // const aboutComponent = () => import(/* webpackChunkName: 'about' */'./components/about').then(({ AboutComponent }) => AboutComponent)
 // const listComponent = () => import(/* webpackChunkName: 'list' */'./components/list').then(({ ListComponent }) => ListComponent)
-{{#hotReload}}
 if (process.env.ENV === 'development' && module.hot) {
   const homeModuleId = './components/home'
   const aboutModuleId = './components/about'
@@ -25,7 +24,6 @@ if (process.env.ENV === 'development' && module.hot) {
   makeHot(listModuleId, listComponent,
     module.hot.accept('./components/list', () => reload(listModuleId, (require('./components/list') as any).ListComponent)))
 }
-{{/hotReload}}
 
 Vue.use(VueRouter)
 

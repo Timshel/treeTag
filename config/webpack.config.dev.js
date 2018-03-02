@@ -43,8 +43,8 @@ webpackConfig.devServer = {
     aggregateTimeout: 300,
     poll: 1000
   },
-  contentBase: './assets',
-  open: true
+  contentBase: './public',
+  open: false
 }
 
 module.exports = webpackConfig

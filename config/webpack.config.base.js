@@ -4,10 +4,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 let config = {
   entry: {
-    'main': helpers.root('/src/main.ts')
+    'main': helpers.root('/assets/main.ts')
   },
   output: {
-    path: helpers.root('/dist'),
+    path: helpers.root('/public'),
     filename: 'js/[name].[hash].js',
     chunkFilename: 'js/[name].[hash].js',
     publicPath: '/'
@@ -34,15 +34,15 @@ let config = {
     {
       test: /\.html$/,
       loader: 'raw-loader',
-      exclude: ['./src/index.html']
+      exclude: ['./assets/index.html']
     }
     ]
   },
   plugins: [
     new NamedModulesPlugin(),
     new CopyWebpackPlugin([{
-      from: 'src/assets',
-      to: './assets'
+      from: 'assets/assets',
+      to: './public'
     } ])
   ]
 }
