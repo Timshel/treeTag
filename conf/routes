@@ -5,6 +5,7 @@
 # Home page
 
 GET     /api/articles                   controllers.Articles.all()
+POST    /api/articles                   controllers.Articles.create()
 GET     /api/articles/:uuid             controllers.Articles.get(uuid: Article.UUID)
 DELETE  /api/articles/:uuid             controllers.Articles.delete(uuid: Article.UUID)
 

@@ -51,8 +51,10 @@ object Articles extends utils.GrammarHelper {
   trait CustomGrammer[K[_, _]] extends utils.JsonGrammar[K] {
     val article: K[Out, Article] = (
       at(Path \ "uuid").is(req[UUID]) ~:
-      at(Path \ "description").is(req[Description]) ~:
-      at(Path \ "content").is(req[Content]) ~:
+      at(Path \ "url").is(req[Url]) ~:
+      at(Path \ "title").is(req[Title]) ~:
+      at(Path \ "description").is(opt[Description]) ~:
+      at(Path \ "content").is(opt[Content]) ~:
       knil
     )
 
@@ -62,8 +64,10 @@ object Articles extends utils.GrammarHelper {
   object Rules extends utils.JsonRules with CustomGrammer[Rule] {
     val create : Rule[JsValue, Article] = (
       Rule.pure[JsValue, UUID](UUID.gen) ~:
-      at(Path \ "description").is(req[Description]) ~:
-      at(Path \ "content").is(req[Content]) ~:
+      at(Path \ "url").is(req[Url]) ~:
+      at(Path \ "title").is(req[Title]) ~:
+      at(Path \ "description").is(opt[Description]) ~:
+      at(Path \ "content").is(opt[Content]) ~:
       knil
     )
   }

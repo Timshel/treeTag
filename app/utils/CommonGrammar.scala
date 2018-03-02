@@ -12,6 +12,8 @@ trait GrammarHelper {
 trait CommonGrammar[I, K[_, _]] extends v3.tagless.Grammar[I, K] {
   implicit def hlistWrapper[T](implicit k: K[I, T]): K[I, T :: HNil] 
   implicit def anyvalDerivation[N <: AnyVal, H <: HList](implicit gen: Generic.Aux[N, H], c: K[I, H]): K[I, N] 
+
+  implicit def urlWrapper: K[I, java.net.URL]
 }
 
 trait JsonGrammar[K[_, _]] extends CommonGrammar[JsValue, K] 
@@ -24,6 +26,15 @@ trait JsonRules extends v3.tagless.playjson.RulesGrammar
 
   implicit def anyvalDerivation[N <: AnyVal, H <: HList](implicit gen: Generic.Aux[N, H], c: Rule[JsValue, H]): Rule[JsValue, N] =
     c.map(r => gen.from(r))
+
+  implicit def urlWrapper: Rule[JsValue, java.net.URL] = string.andThen(
+    Rule.fromMapping[String, java.net.URL] { str =>
+      scala.util.Try(new java.net.URL(str)).fold(
+        err => Invalid(Seq(ValidationError(err.getMessage))),
+        url => Valid(url)
+      )
+    }
+  )
 }
 
 
@@ -37,4 +48,7 @@ trait JsonWrites extends v3.tagless.playjson.WritesGrammar
   implicit def anyvalDerivation[N <: AnyVal, H <: HList](implicit gen: Generic.Aux[N, H], w: Write[H, JsValue]): Write[N, JsValue]  = {
     w.contramap { h => gen.to(h) }
   }
+
+  implicit def urlWrapper: Write[java.net.URL, JsValue] = 
+    string.contramap { url => url.toString }
 }
