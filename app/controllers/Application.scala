@@ -8,5 +8,7 @@ class Application(
 
   implicit val ec = gEc
 
-  def index =  ???
+  def index(path: String) =  Action { _ =>
+  	Ok(views.html.index())
+  }
 }

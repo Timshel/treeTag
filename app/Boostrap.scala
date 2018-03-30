@@ -40,7 +40,7 @@ class ApplicationEnv(context: Context)
   }
 
   val httpFilters = Seq.empty
-  val router = new Routes(httpErrorHandler, Controllers.articles, assets)
+  val router = new Routes(httpErrorHandler, Controllers.articles, assets, Controllers.application)
 
   applicationEvolutions.start()
 }

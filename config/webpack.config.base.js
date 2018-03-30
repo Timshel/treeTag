@@ -1,6 +1,7 @@
-const helpers = require('./helpers')
-const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const helpers               = require('./helpers')
+const LimitChunkCountPlugin = require('webpack/lib/optimize/LimitChunkCountPlugin')
+const NamedModulesPlugin    = require('webpack/lib/NamedModulesPlugin')
+const CopyWebpackPlugin     = require('copy-webpack-plugin')
 
 let config = {
   entry: {
@@ -8,8 +9,7 @@ let config = {
   },
   output: {
     path: helpers.root('/public'),
-    filename: 'js/[name].[hash].js',
-    chunkFilename: 'js/[name].[hash].js',
+    filename: 'js/[name].js',
     publicPath: '/'
   },
   devtool: 'source-map',
@@ -39,10 +39,13 @@ let config = {
     ]
   },
   plugins: [
+    new LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
     new NamedModulesPlugin(),
     new CopyWebpackPlugin([{
       from: 'assets/assets',
-      to: './public'
+      to: '.'
     } ])
   ]
 }

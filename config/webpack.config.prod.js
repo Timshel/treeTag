@@ -1,4 +1,3 @@
-const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin')
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
@@ -12,7 +11,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const env = require('../environment/prod.env')
 
 const extractSass = new ExtractTextPlugin({
-  filename: 'css/[name].[contenthash].css',
+  filename: 'css/[name].css',
   disable: process.env.NODE_ENV === 'development'
 })
 
@@ -74,16 +73,6 @@ webpackConfig.module.rules[0].options = {
 }
 
 webpackConfig.plugins = [...webpackConfig.plugins,
-  new CommonsChunkPlugin({
-    name: 'vendor',
-    minChunks: function (module) {
-      return module.context && module.context.indexOf('node_modules') !== -1
-    }
-  }),
-  new CommonsChunkPlugin({
-    name: 'manifest',
-    minChunks: Infinity
-  }),
   extractSass,
   new OptimizeCssAssetsPlugin({
     cssProcessor: require('cssnano'),
@@ -92,23 +81,6 @@ webpackConfig.plugins = [...webpackConfig.plugins,
       discardComments: { removeAll: true }
     },
     canPrint: true
-  }),
-  new HtmlWebpackPlugin({
-    inject: true,
-    template: helpers.root('/assets/index.html'),
-    favicon: helpers.root('/assets/favicon.ico'),
-    minify: {
-      removeComments: true,
-      collapseWhitespace: true,
-      removeRedundantAttributes: true,
-      useShortDoctype: true,
-      removeEmptyAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      keepClosingSlash: true,
-      minifyJS: true,
-      minifyCSS: true,
-      minifyURLs: true
-    }
   }),
   new UglifyJsPlugin({
     include: /\.js$/,
@@ -120,8 +92,7 @@ webpackConfig.plugins = [...webpackConfig.plugins,
   }),
   new DefinePlugin({
     'process.env': env
-  }),
-  new FaviconsWebpackPlugin(helpers.root('/assets/icon.png'))
+  })
 ]
 
 module.exports = webpackConfig
