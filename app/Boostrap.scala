@@ -9,9 +9,12 @@ import play.api.{Application, ApplicationLoader, Environment, Logger}
 import service._
 
 class BootstrapLoader extends ApplicationLoader {
+
+  val logger = Logger("BootstrapLoader")
+
   def load(context: Context): Application = {
     // Bootstrap the injected application
-    Logger.info("All good")
+    logger.info("All good")
     new env.ApplicationEnv(context).application
   }
 } 

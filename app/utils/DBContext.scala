@@ -20,8 +20,10 @@ case class DBContext(
   import doobie.implicits._
 
   implicit val ec = dbEc.ec
+  implicit val cs = IO.contextShift(ec)
+  val blocker = cats.effect.Blocker.liftExecutionContext(ec)
 
-  val xa  = Transactor.fromDataSource[IO](ds)
+  val xa  = Transactor.fromDataSource[IO](ds, ec, blocker)
   
   def run[T](a: ConnectionIO[T]): Future[T] = a.transact(xa).unsafeToFuture()
 

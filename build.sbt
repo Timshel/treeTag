@@ -19,7 +19,7 @@ scalacOptions ++= Seq(
 
 javaOptions += "-Duser.timezone=UTC"
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -28,9 +28,9 @@ libraryDependencies ++= Seq(
   ehcache,
   jdbc,
   evolutions,
-  "org.tpolecat" %% "doobie-core" % "0.5.1",
-  "org.tpolecat" %% "doobie-postgres"  % "0.5.1", 
-  "org.tpolecat" %% "doobie-scalatest" % "0.5.1" % Test,
+  "org.tpolecat" %% "doobie-core" % "0.8.8",
+  "org.tpolecat" %% "doobie-postgres"  % "0.8.8", 
+  "org.tpolecat" %% "doobie-scalatest" % "0.8.8" % Test,
   "com.typesafe.play" %% "play-json" % "2.7.4",
   "io.github.jto" %% "validation-core" % "3.0.0-SNAPSHOT",
   "io.github.jto" %% "validation-playjson" % "3.0.0-SNAPSHOT",

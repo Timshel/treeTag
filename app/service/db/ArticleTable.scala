@@ -25,6 +25,8 @@ case class ArticleTable(
 object ArticleTable extends utils.CommonDoobie {  
   import doobie.implicits._
 
+  implicit val articleM: Meta[Article] = Meta[Article]
+
   val upsertQuery = Update[NewArticle]("""
     INSERT INTO article (uuid, url, title, description, content, created, updated)
       VALUES (?, ?, ?, ?, ?, now(), now())
