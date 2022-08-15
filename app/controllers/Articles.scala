@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc._
-import play.api.libs.json.{JsValue, JsString}
+import play.api.libs.json.JsString
 import scala.concurrent.Future
 import models._, Article._
 
@@ -12,11 +12,10 @@ case class Articles(
   val controllerComponents : play.api.mvc.ControllerComponents, 
   gEc                      : EC.GlobalEC
 ) extends BaseController {
-  import Articles._
   implicit val ec = gEc.ec
 
   def create = Action.async(parse.json) { r =>
-    Rules.create.validate(r.body).fold( 
+    Articles.create.reads(r.body).fold( 
       err => Future.successful(BadRequest),
       article => articleTable.upsert(article).map { _ =>
         Ok(new JsString(article.select[UUID].value))
@@ -26,7 +25,7 @@ case class Articles(
 
   def get(uuid: UUID) = Action.async {
     articleTable.find(uuid).map {
-      case Some(a) => Ok(Writes.article.writes(a))
+      case Some(a) => Ok(Articles.writer.writes(a))
       case None    => NotFound
     }
   }
@@ -40,39 +39,42 @@ case class Articles(
 
   def all() = Action.async {
     articleTable.all().map { articles =>
-      Ok(Writes.articles.writes(articles))
+      Ok(Articles.articles.writes(articles))
     }
   }
 }
 
-object Articles extends utils.GrammarHelper {
-  import jto.validation.{Rule, Write, Path}
+object Articles extends utils.CommonReads with utils.CommonWrites {
+  import play.api.libs.json._
+  import play.api.libs.functional.syntax._
+  import shapeless.syntax.std.tuple._
 
-  trait CustomGrammer[K[_, _]] extends utils.JsonGrammar[K] {
-    val article: K[Out, Article] = (
-      at(Path \ "uuid").is(req[UUID]) ~:
-      at(Path \ "url").is(req[Url]) ~:
-      at(Path \ "title").is(req[Title]) ~:
-      at(Path \ "description").is(opt[Description]) ~:
-      at(Path \ "content").is(opt[Content]) ~:
-      at(Path \ "created").is(req[Created]) ~:
-      at(Path \ "updated").is(req[Updated]) ~:
-      knil
-    )
+  val create : Reads[NewArticle] = (
+    (JsPath \ "url").read[Url] and
+    (JsPath \ "title").read[Title] and
+    (JsPath \ "description").readNullable[Description] and
+    (JsPath \ "content").readNullable[Content]
+  ).tupled.map{ t => UUID.gen :: t.productElements }
 
-    val articles: K[JsValue, Seq[Article]] = seq(article)
-  }
+  val reader: Reads[Article] = (
+    (JsPath \ "uuid").read[UUID] and
+    (JsPath \ "url").read[Url] and
+    (JsPath \ "title").read[Title] and
+    (JsPath \ "description").readNullable[Description] and
+    (JsPath \ "content").readNullable[Content] and
+    (JsPath \ "created").read[Created] and
+    (JsPath \ "updated").read[Updated]
+  ).tupled.map(_.productElements)
 
-  object Rules extends utils.JsonRules with CustomGrammer[Rule] {
-    val create : Rule[JsValue, NewArticle] = (
-      Rule.pure[JsValue, UUID](UUID.gen) ~:
-      at(Path \ "url").is(req[Url]) ~:
-      at(Path \ "title").is(req[Title]) ~:
-      at(Path \ "description").is(opt[Description]) ~:
-      at(Path \ "content").is(opt[Content]) ~:
-      knil
-    )
-  }
- 
-  object Writes extends utils.JsonWrites with CustomGrammer[op[Write]#λ] 
+  implicit val writer: Writes[Article] = (
+    (JsPath \ "uuid").write[UUID] and
+    (JsPath \ "url").write[Url] and
+    (JsPath \ "title").write[Title] and
+    (JsPath \ "description").writeNullable[Description] and
+    (JsPath \ "content").writeNullable[Content] and
+    (JsPath \ "created").write[Created] and
+    (JsPath \ "updated").write[Updated]
+  ).tupled.contramap(_.tupled)
+
+  val articles: Writes[List[Article]] = arrayWrites[Article].contramap(_.toArray)
 }

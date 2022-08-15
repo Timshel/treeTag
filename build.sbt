@@ -32,8 +32,6 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-postgres"  % "0.8.8", 
   "org.tpolecat" %% "doobie-scalatest" % "0.8.8" % Test,
   "com.typesafe.play" %% "play-json" % "2.7.4",
-  "io.github.jto" %% "validation-core" % "3.0.0-SNAPSHOT",
-  "io.github.jto" %% "validation-playjson" % "3.0.0-SNAPSHOT",
   "com.chuusai" %% "shapeless" % "2.3.3"
 )
 
