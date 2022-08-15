@@ -27,7 +27,7 @@ object ArticleTable extends utils.CommonDoobie {
 
   implicit val articleM: Meta[Article] = Meta[Article]
 
-  val upsertQuery = Update[NewArticle]("""
+  val upsertQuery: Update[NewArticle] = Update[NewArticle]("""
     INSERT INTO article (uuid, url, title, description, content, created, updated)
       VALUES (?, ?, ?, ?, ?, now(), now())
       ON CONFLICT (uuid) DO UPDATE SET 
@@ -47,7 +47,7 @@ object ArticleTable extends utils.CommonDoobie {
     SELECT uuid, url, title, description, content, created, updated FROM article
   """.query[Article]
 
-  val deleteQuery = Update[UUID]("""
+  val deleteQuery: Update[UUID] = Update[UUID]("""
     DELETE from article WHERE uuid = ?
   """)
 }

@@ -4,6 +4,8 @@ import play.api.mvc._
 import play.api.libs.json.JsString
 import scala.concurrent.Future
 import models._, Article._
+import play.api.libs.json.JsValue
+import scala.concurrent.ExecutionContext
 
 case class Articles(
   articleTable : service.db.ArticleTable
@@ -12,9 +14,9 @@ case class Articles(
   val controllerComponents : play.api.mvc.ControllerComponents, 
   gEc                      : EC.GlobalEC
 ) extends BaseController {
-  implicit val ec = gEc.ec
+  implicit val ec: ExecutionContext = gEc.ec
 
-  def create = Action.async(parse.json) { r =>
+  def create: Action[JsValue] = Action.async(parse.json) { r =>
     Articles.create.reads(r.body).fold( 
       err => Future.successful(BadRequest),
       article => articleTable.upsert(article).map { _ =>
@@ -23,21 +25,21 @@ case class Articles(
     )
   }
 
-  def get(uuid: UUID) = Action.async {
+  def get(uuid: UUID): Action[AnyContent] = Action.async {
     articleTable.find(uuid).map {
       case Some(a) => Ok(Articles.writer.writes(a))
       case None    => NotFound
     }
   }
 
-  def delete(uuid: UUID) = Action.async {
+  def delete(uuid: UUID): Action[AnyContent] = Action.async {
     articleTable.delete(uuid).map {
       case true  => Ok
       case false => NotFound
     }
   }
 
-  def all() = Action.async {
+  def all(): Action[AnyContent] = Action.async {
     articleTable.all().map { articles =>
       Ok(Articles.articles.writes(articles))
     }

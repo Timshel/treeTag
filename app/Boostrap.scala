@@ -7,10 +7,13 @@ import play.api.db.evolutions.EvolutionsComponents
 import router.Routes
 import play.api.{Application, ApplicationLoader, Environment, Logger}
 import service._
+import models.EC
+import service.db.ArticleTable
+import utils.DBContext
 
 class BootstrapLoader extends ApplicationLoader {
 
-  val logger = Logger("BootstrapLoader")
+  val logger: Logger = Logger("BootstrapLoader")
 
   def load(context: Context): Application = {
     // Bootstrap the injected application
@@ -26,14 +29,14 @@ class ApplicationEnv(context: Context)
     with DBComponents
     with EvolutionsComponents {
 
-  implicit val gEc = models.EC.GlobalEC(scala.concurrent.ExecutionContext.Implicits.global)
-  implicit val dbEc = models.EC.DatabaseEC(scala.concurrent.ExecutionContext.Implicits.global)
+  implicit val gEc: EC.GlobalEC = models.EC.GlobalEC(scala.concurrent.ExecutionContext.Implicits.global)
+  implicit val dbEc: EC.DatabaseEC = models.EC.DatabaseEC(scala.concurrent.ExecutionContext.Implicits.global)
 
   val connectionPool = new play.api.db.HikariCPConnectionPool(Environment.simple())
-  val dbContext = utils.DBContext(dbApi.database("default").dataSource, dbEc)
+  val dbContext: DBContext = utils.DBContext(dbApi.database("default").dataSource, dbEc)
 
   object Services {
-    val articleTable = db.ArticleTable(dbContext)
+    val articleTable: ArticleTable = db.ArticleTable(dbContext)
   }
 
   object Controllers {

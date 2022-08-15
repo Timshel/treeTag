@@ -4,6 +4,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import doobie._
 import doobie.util.transactor.Transactor
 import cats.effect.IO
+import cats.effect.{ Blocker, ContextShift }
+import javax.sql.DataSource
 
 trait DBHelper {
 
@@ -19,11 +21,11 @@ case class DBContext(
 ) {
   import doobie.implicits._
 
-  implicit val ec = dbEc.ec
-  implicit val cs = IO.contextShift(ec)
-  val blocker = cats.effect.Blocker.liftExecutionContext(ec)
+  implicit val ec: ExecutionContext = dbEc.ec
+  implicit val cs: ContextShift[IO] = IO.contextShift(ec)
+  val blocker: Blocker = cats.effect.Blocker.liftExecutionContext(ec)
 
-  val xa  = Transactor.fromDataSource[IO](ds, ec, blocker)
+  val xa: Transactor.Aux[IO,DataSource]  = Transactor.fromDataSource[IO](ds, ec, blocker)
   
   def run[T](a: ConnectionIO[T]): Future[T] = a.transact(xa).unsafeToFuture()
 
