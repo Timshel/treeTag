@@ -1,26 +1,26 @@
+<template>
+  <div class="list">
+    <h1>List</h1>
+    <ul>
+      <li v-for="item in items" v-bind:key="item.name" >{{item.name}}</li>
+      <li v-for="item in items" v-bind:key="item.name" >{{item.name}}</li>
+    </ul>
+  </div>
+</template>
+
+<script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import axios, { AxiosResponse } from 'axios'
-import bContainer from 'bootstrap-vue/es/components/layout/container'
-import bCol from 'bootstrap-vue/es/components/layout/col'
-import bRow from 'bootstrap-vue/es/components/layout/row'
 
 interface UserResponse {
   id: string
   name: string
 }
 
-@Component({
-  template: require('./list.html'),
-  components: {
-    'b-container': bContainer,
-    'b-col': bCol,
-    'b-row': bRow
-  }
-})
-export class ListComponent extends Vue {
-
+@Component
+export default class DisplayList extends Vue {
   items: UserResponse[] = []
-  protected axios
+  protected axios: any
   private url = 'https://jsonplaceholder.typicode.com/users'
 
   constructor () {
@@ -38,9 +38,10 @@ export class ListComponent extends Vue {
     if (!this.items.length) {
       this.axios.get(this.url).then((response: AxiosResponse) => {
         this.items = response.data
-      }, (error) => {
+      }, (error: any) => {
         console.error(error)
       })
     }
   }
 }
+</script>
