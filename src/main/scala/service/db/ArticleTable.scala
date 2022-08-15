@@ -1,7 +1,7 @@
 package service.db
 
+import cats.effect.IO
 import doobie._
-import scala.concurrent.Future
 import models._, Article._
 
 case class ArticleTable(
@@ -9,16 +9,16 @@ case class ArticleTable(
 ) extends utils.DBHelper {
   import ArticleTable._
 
-  def upsert(a: NewArticle): Future[Int] = 
+  def upsert(a: NewArticle): IO[Int] = 
     dbContext.run(upsertQuery.run(a))
 
-  def find(uuid: UUID): Future[Option[Article]] = 
+  def find(uuid: UUID): IO[Option[Article]] = 
     dbContext.run(findQuery(uuid).option)
 
-  def all(): Future[List[Article]] = 
+  def all(): IO[List[Article]] = 
     dbContext.run(allQuery.to[List])
 
-  def delete(uuid: UUID): Future[Boolean] =
+  def delete(uuid: UUID): IO[Boolean] =
     dbContext.run(deleteQuery.run(uuid)).map(_ == 1)
 }
 
