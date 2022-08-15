@@ -54,7 +54,7 @@ object Articles extends utils.CommonReads with utils.CommonWrites {
     (JsPath \ "title").read[Title] and
     (JsPath \ "description").readNullable[Description] and
     (JsPath \ "content").readNullable[Content]
-  ).tupled.map{ t => UUID.gen :: t.productElements }
+  ).tupled.map{ t => UUID.gen() :: t.productElements }
 
   val reader: Reads[Article] = (
     (JsPath \ "uuid").read[UUID] and

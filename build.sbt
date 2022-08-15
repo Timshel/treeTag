@@ -1,7 +1,7 @@
 name := "treeTag"
 
 version := "1.0-SNAPSHOT"
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.8"
 
 scalacOptions ++= Seq(
   "-Yrangepos",
@@ -10,9 +10,9 @@ scalacOptions ++= Seq(
   "-feature",
   "-encoding", "UTF-8",
 //  "-unchecked",
-  "-Yno-adapted-args",
+//  "-Yno-adapted-args",
   "-Ywarn-numeric-widen",
-  "-Ypartial-unification",
+//  "-Ypartial-unification",
   "-language:higherKinds"
 // "-Ywarn-unused-import"
 )
@@ -28,11 +28,11 @@ libraryDependencies ++= Seq(
   ehcache,
   jdbc,
   evolutions,
-  "org.tpolecat" %% "doobie-core" % "0.8.8",
-  "org.tpolecat" %% "doobie-postgres"  % "0.8.8", 
-  "org.tpolecat" %% "doobie-scalatest" % "0.8.8" % Test,
-  "com.typesafe.play" %% "play-json" % "2.7.4",
-  "com.chuusai" %% "shapeless" % "2.3.3"
+  "org.tpolecat" %% "doobie-core" % "0.13.1",
+  "org.tpolecat" %% "doobie-postgres"  % "0.13.1", 
+  "org.tpolecat" %% "doobie-scalatest" % "0.13.1" % Test,
+  "com.typesafe.play" %% "play-json" % "2.8.2",
+  "com.chuusai" %% "shapeless" % "2.3.7"
 )
 
 routesImport  ++= Seq(
