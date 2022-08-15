@@ -10,8 +10,7 @@ import org.http4s.dsl.io._
 case class ArticlesController(
   articleTable : service.db.ArticleTable
 ) {
-  import org.http4s.play.jsonDecoder
-  import org.http4s.play.jsonEncoder
+  import controllers.HTTP4SJsParser._
 
   val routes = org.http4s.HttpRoutes.of[IO] {
     case _ @ GET -> Root =>
