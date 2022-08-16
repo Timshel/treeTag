@@ -28,7 +28,7 @@ lazy val treeTag = project.in(file("."))
       "org.tpolecat" %% "doobie-postgres"  % "1.0.0-RC2", 
       "org.tpolecat" %% "doobie-scalatest" % "1.0.0-RC2" % Test,
       "com.typesafe.play" %% "play-json" % "2.10.0-RC6",
-      ("com.chuusai" %% "shapeless" % "2.3.7").cross(CrossVersion.for3Use2_13),
+      ("com.chuusai" %% "shapeless" % "2.3.9").cross(CrossVersion.for3Use2_13),
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion         % Runtime,
       "org.scalameta"   %% "munit"               % MunitVersion           % Test,
       "org.typelevel"   %% "munit-cats-effect-3" % MunitCatsEffectVersion % Test
