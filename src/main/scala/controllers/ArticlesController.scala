@@ -11,6 +11,7 @@ case class ArticlesController(
   articleTable : service.db.ArticleTable
 ) {
   import controllers.HTTP4SJsParser._
+  import utils.TupleSelector
 
   val routes = org.http4s.HttpRoutes.of[IO] {
     case _ @ GET -> Root =>
@@ -45,14 +46,14 @@ case class ArticlesController(
 object ArticlesController extends utils.CommonReads with utils.CommonWrites {
   import _root_.play.api.libs.json._
   import _root_.play.api.libs.functional.syntax._
-  import shapeless.syntax.std.tuple._
 
   val create : Reads[NewArticle] = (
     (JsPath \ "url").read[Url] and
     (JsPath \ "title").read[Title] and
     (JsPath \ "description").readNullable[Description] and
     (JsPath \ "content").readNullable[Content]
-  ).tupled.map{ t => UUID.gen() :: t.productElements }
+  ).tupled.map { t => Tuple(UUID.gen()) ++ t }
+
 
   val reader: Reads[Article] = (
     (JsPath \ "uuid").read[UUID] and
@@ -62,7 +63,11 @@ object ArticlesController extends utils.CommonReads with utils.CommonWrites {
     (JsPath \ "content").readNullable[Content] and
     (JsPath \ "created").read[Created] and
     (JsPath \ "updated").read[Updated]
-  ).tupled.map(_.productElements)
+  ).tupled.map { _ => 
+    // t.productElements(fullGeneric))
+    val toto : Article = null
+    toto
+  }
 
   implicit val writer: Writes[Article] = (
     (JsPath \ "uuid").write[UUID] and
@@ -72,7 +77,8 @@ object ArticlesController extends utils.CommonReads with utils.CommonWrites {
     (JsPath \ "content").writeNullable[Content] and
     (JsPath \ "created").write[Created] and
     (JsPath \ "updated").write[Updated]
-  ).tupled.contramap(_.tupled)
+  ).tupled
 
   implicit val articles: Writes[List[Article]] = arrayWrites[Article].contramap(_.toArray)
 }
+

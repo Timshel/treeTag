@@ -26,6 +26,8 @@ object ArticleTable extends utils.CommonDoobie {
   import doobie.implicits._
 
   implicit val articleM: Meta[Article] = Meta[Article]
+  implicit val articleW: Write[models.NewArticle] = implicitly[Write[models.NewArticle]]
+  implicit val articleUUIDW: Write[models.Article.UUID] = implicitly[Write[models.Article.UUID]]
 
   val upsertQuery: Update[NewArticle] = Update[NewArticle]("""
     INSERT INTO article (uuid, url, title, description, content, created, updated)
